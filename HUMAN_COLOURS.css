@@ -1,0 +1,61 @@
+
+    h1 {
+      font-size: 75px;
+      color: #ffffff;
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    .h1_orders {
+      font-size: 75px;
+      color: #000000;
+      text-align: center;
+      margin-top: 50px;
+    }
+    .container_option {
+      max-width: 600px;
+      margin: 0 auto;
+
+      text-align: center;
+      background-color: #935600;
+      padding: 10px;
+      border-radius: 15px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+
+      text-align: center;
+      background-color: #a05d00;
+      padding: 50px;
+      border-radius: 15px;
+    }
+    .img {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      margin: 0 auto;
+      display: block;
+    }
+
+    .link_button {
+      font-size: 18px;
+      color: #ffffff;
+      margin-top: 2px;
+      display: inline-block;
+      padding: 15px 30px;
+      border: 3px solid #ffffff;
+      border-radius: 25px;
+      transition: all 0.3s ease-in-out;
+      text-decoration: none;
+    }
+    .link_button:hover {
+      background-color: #ff7512;
+      color: #ffffff;
+      cursor: pointer;
+    }
+    .p{
+      font-size: 24px;
+      color: #ffffff;
+      margin-top: 10px;
+    }

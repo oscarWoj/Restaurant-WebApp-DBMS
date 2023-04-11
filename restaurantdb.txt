@@ -1,0 +1,228 @@
+drop database if exists restaurantdb;
+create database restaurantdb;
+use restaurantdb;
+
+create table customerAccount(
+    emailAddress varchar(100),
+    firstName varchar(100),
+    lastName varchar(100),
+    cellNum char(10),
+    streetAddress varchar(100),
+    city varchar(100),
+    pc char(6),
+    creditAmt decimal(6, 2),
+    primary key (emailAddress));
+
+create table foodOrder(
+	orderID integer,
+	totalPrice decimal(6,2),
+	tip decimal(6, 2),
+	primary key (orderID));
+
+create table food (
+	name varchar(100),
+	primary key (name));
+
+create table restaurant(
+	name varchar(100),
+	streetAddress varchar(100),
+	city varchar(100),
+	pc char(6),
+	url varchar(200),
+	primary key (name));
+
+create table employee(
+	ID integer,
+	firstName varchar(100),
+	lastName varchar(100),
+	emailAddress varchar(100),
+    restaurantName varchar(100),
+	primary key (ID),
+    foreign key(restaurantName) references restaurant(name));
+
+create table manager(
+	empid integer primary key,
+	foreign key (empid) references employee(ID) on delete cascade);
+
+create table serverStaff(
+	empid integer primary key,
+	foreign key (empid) references employee(ID) on delete cascade);
+
+create table chef(
+	empid integer primary key,
+	foreign key (empid) references employee(ID) on delete cascade);
+
+create table deliveryPerson(
+	empid integer primary key,
+	foreign key (empid) references employee(ID) on delete cascade);
+
+create table payment(
+	customerEmail varchar(100),
+	date date not null,
+	paymentAmount decimal(6,2) not null,
+	primary key (customerEmail, date),
+	foreign key (customerEmail) references customerAccount(emailAddress) on delete cascade);
+
+create table shift(
+	empID integer not null,
+	day varchar(15) not null,
+	startTime time not null,
+	endTime time not null,
+	primary key (empID, day),
+	foreign key (empID) references employee(ID) on delete cascade);
+
+create table chefCredentials (
+	empID integer not null,
+	cred varchar(30),
+	primary key (empID, cred),
+	foreign key (empID) references employee(ID) on delete cascade);
+
+create table orderPlacement(
+	customerEmail varchar(100) not null,
+	orderID integer not null,
+	restaurant varchar(100) not null,
+	orderTime time,
+	orderDate date,
+	primary key (customerEmail, orderID, restaurant),
+	foreign key (customerEmail) references customerAccount(emailAddress) on delete cascade,
+	foreign key (orderID) references foodOrder(orderID) on delete cascade,
+	foreign key (restaurant) references restaurant(name) on delete cascade);
+
+create table relatedTo(
+	customer varchar(100) not null,
+	employee integer not null,
+	relationship varchar(100),
+	primary key (customer, employee),
+	foreign key (customer) references customerAccount(emailAddress) on delete cascade,
+	foreign key (employee) references employee(ID) on delete cascade);
+
+create table menu(
+	restaurant varchar(100) not null,
+	food varchar(100) not null,
+	price decimal(6, 2),
+	primary key (restaurant, food),
+	foreign key (restaurant) references restaurant(name) on delete cascade,
+	foreign key (food) references food (name) on delete cascade);
+
+create table foodItemsinOrder(
+	orderID integer not null,
+	food varchar(100) not null,
+	primary key (orderID, food),
+	foreign key (orderID) references foodOrder(orderID) on delete cascade,
+	foreign key (food) references food(name) on delete cascade);
+
+create table delivery(
+	orderID integer not null,
+	deliveryPerson integer not null,
+	deliveryTime time,
+	primary key (orderID, deliveryPerson),
+	foreign key (orderID) references foodOrder(orderID) on delete cascade,
+	foreign key (deliveryPerson) references employee(id) on delete cascade);
+
+create table worksAt(
+	employeeID integer not null,
+	restaurant varchar(100) not null,
+	primary key (employeeID, restaurant),
+	foreign key (employeeID) references employee(ID) on delete cascade,
+	foreign key (restaurant) references restaurant(name) on delete cascade);
+
+
+
+-- Inserting example data
+
+INSERT INTO customerAccount (emailAddress, firstName, lastName, cellNum, streetAddress, city, pc, creditAmt) 
+VALUES ('legit_customer@email.com', 'Normal', 'Guy', '1234567890', '1234 Avenue Street', 'Springfield', 'm9i9q9', 300.00);
+
+-- Insert food items
+INSERT INTO food (name) VALUES ('Mechanical Burger');
+INSERT INTO food (name) VALUES ('Silicon Salad');
+INSERT INTO food (name) VALUES ('Battery Bites');
+INSERT INTO food (name) VALUES ('GPU Guacamole');
+INSERT INTO food (name) VALUES ('Quantum Quesadilla');
+
+INSERT INTO restaurant (name, streetAddress, city, pc, url) VALUES ('Human Joe\'s Restaurant', '123 Normal St', 'CONSUMER CITY', 'H1U2M3', 'https://www.humanjoesrestaurant.com');
+
+INSERT INTO employee (ID, firstName, lastName, emailAddress, restaurantName) VALUES (1, 'Joe', 'Rocket', 'joe.Rock@email.com', 'Human Joe\'s Restaurant');
+
+INSERT INTO manager (empid) VALUES (1);
+
+INSERT INTO foodOrder (orderID, totalPrice, tip) VALUES (1, 17.00, 5.00);
+INSERT INTO foodOrder (orderID, totalPrice, tip) VALUES (2, 17.00, 5.00);
+INSERT INTO foodOrder (orderID, totalPrice, tip) VALUES (3, 20.00, 5.00);
+INSERT INTO foodOrder (orderID, totalPrice, tip) VALUES (4, 12.00, 5.00);
+INSERT INTO foodOrder (orderID, totalPrice, tip) VALUES (5, 20.00, 5.00);
+
+INSERT INTO payment (customerEmail, date, paymentAmount) VALUES ('legit_customer@email.com', '2023-04-05', 30.00);
+INSERT INTO payment (customerEmail, date, paymentAmount) VALUES ('legit_customer@email.com', '2023-04-06', 120.00);
+
+INSERT INTO orderPlacement (customerEmail, orderID, restaurant, orderTime, orderDate) VALUES ('legit_customer@email.com', 1, 'Human Joe\'s Restaurant', '18:00:00', '2023-04-05');
+INSERT INTO orderPlacement (customerEmail, orderID, restaurant, orderTime, orderDate) VALUES ('legit_customer@email.com', 2, 'Human Joe\'s Restaurant', '18:00:00', '2023-04-06');
+INSERT INTO orderPlacement (customerEmail, orderID, restaurant, orderTime, orderDate) VALUES ('legit_customer@email.com', 3, 'Human Joe\'s Restaurant', '18:00:00', '2023-04-07');
+INSERT INTO orderPlacement (customerEmail, orderID, restaurant, orderTime, orderDate) VALUES ('legit_customer@email.com', 4, 'Human Joe\'s Restaurant', '18:00:00', '2023-04-08');
+INSERT INTO orderPlacement (customerEmail, orderID, restaurant, orderTime, orderDate) VALUES ('legit_customer@email.com', 5, 'Human Joe\'s Restaurant', '18:00:00', '2023-04-09');
+
+
+INSERT INTO menu (restaurant, food, price) VALUES ('Human Joe\'s Restaurant', 'Mechanical Burger', 12.00);
+INSERT INTO menu (restaurant, food, price) VALUES ('Human Joe\'s Restaurant', 'Silicon Salad', 8.00);
+INSERT INTO menu (restaurant, food, price) VALUES ('Human Joe\'s Restaurant', 'Battery Bites', 5.00);
+INSERT INTO menu (restaurant, food, price) VALUES ('Human Joe\'s Restaurant', 'GPU Guacamole', 7.00);
+INSERT INTO menu (restaurant, food, price) VALUES ('Human Joe\'s Restaurant', 'Quantum Quesadilla', 15.00);
+
+
+INSERT INTO foodItemsinOrder (orderID, food) VALUES (1, 'Mechanical Burger');
+INSERT INTO foodItemsinOrder (orderID, food) VALUES (1, 'Battery Bites');
+
+INSERT INTO foodItemsinOrder (orderID, food) VALUES (2, 'Mechanical Burger');
+INSERT INTO foodItemsinOrder (orderID, food) VALUES (2, 'Battery Bites');
+
+INSERT INTO foodItemsinOrder (orderID, food) VALUES (3, 'Quantum Quesadilla');
+INSERT INTO foodItemsinOrder (orderID, food) VALUES (3, 'Battery Bites');
+
+INSERT INTO foodItemsinOrder (orderID, food) VALUES (4, 'GPU Guacamole');
+INSERT INTO foodItemsinOrder (orderID, food) VALUES (4, 'Battery Bites');
+
+INSERT INTO foodItemsinOrder (orderID, food) VALUES (5, 'Quantum Quesadilla');
+INSERT INTO foodItemsinOrder (orderID, food) VALUES (5, 'Battery Bites');
+
+-- Insert employee info
+INSERT INTO employee (ID, firstName, lastName, emailAddress, restaurantName) 
+VALUES (2, 'Sufficient', 'Server', 'server@email.com', 'Human Joe\'s Restaurant');
+INSERT INTO employee (ID, firstName, lastName, emailAddress, restaurantName) 
+VALUES (3, 'Cunning', 'Chef', 'chef@email.com', 'Human Joe\'s Restaurant');
+INSERT INTO employee (ID, firstName, lastName, emailAddress, restaurantName) 
+VALUES (4, 'Dashing', 'Deliverer', 'deliver@email.com', 'Human Joe\'s Restaurant');
+
+INSERT INTO serverStaff (empid) VALUES (2);
+INSERT INTO chef (empid) VALUES (3);
+INSERT INTO deliveryPerson (empid) VALUES (4);
+
+INSERT INTO shift (empID, day, startTime, endTime) VALUES (2, 'Monday', '08:00:00', '17:00:00');
+INSERT INTO shift (empID, day, startTime, endTime) VALUES (3, 'Monday', '15:00:00', '22:00:00');
+INSERT INTO shift (empID, day, startTime, endTime) VALUES (4, 'Monday', '18:00:00', '01:00:00');
+
+INSERT INTO chefCredentials (empID, cred) VALUES (3, 'MASTER SATIATER');
+
+INSERT INTO relatedTo (customer, employee, relationship) VALUES ('legit_customer@email.com', 2, 'Friend');
+
+INSERT INTO delivery (orderID, deliveryPerson, deliveryTime) VALUES (1, 4, '18:30:00');
+INSERT INTO delivery (orderID, deliveryPerson, deliveryTime) VALUES (2, 4, '18:30:00');
+INSERT INTO delivery (orderID, deliveryPerson, deliveryTime) VALUES (3, 4, '19:30:00');
+INSERT INTO delivery (orderID, deliveryPerson, deliveryTime) VALUES (4, 4, '20:30:00');
+INSERT INTO delivery (orderID, deliveryPerson, deliveryTime) VALUES (5, 4, '18:30:00');
+
+
+INSERT INTO worksAt (employeeID, restaurant) VALUES (2, 'Human Joe\'s Restaurant');
+INSERT INTO worksAt (employeeID, restaurant) VALUES (3, 'Human Joe\'s Restaurant');
+INSERT INTO worksAt (employeeID, restaurant) VALUES (4, 'Human Joe\'s Restaurant');
+
+
+-- I am using a user with select and 1 insert privledge to demonstrate 
+-- The security measures we learnt in class
+
+DROP USER IF EXISTS 'web_user'@'localhost';
+
+-- Add user for the web application ( ENCHANCED DATABASE SECURITY)
+CREATE USER 'web_user'@'localhost' IDENTIFIED BY 'SECURE_PASSWORD';
+GRANT SELECT ON *.* TO 'web_user'@'localhost';
+GRANT INSERT ON restaurantdb.customerAccount TO 'web_user'@'localhost';
+FLUSH PRIVILEGES;
